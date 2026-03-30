@@ -2,7 +2,7 @@
 	"name": "copilot-chat",
 	"displayName": "GitHub Copilot Chat",
 	"description": "AI chat features powered by Copilot",
-	"version": "0.42.0",
+	"version": "0.43.0",
 	"build": "1",
 	"internalAIKey": "1058ec22-3c95-4951-8443-f26c1f325911",
 	"completionsCoreVersion": "1.378.1799",
@@ -4874,32 +4874,32 @@
 			"chat/input/editing/sessionApplyActions": [
 				{
 					"command": "github.copilot.sessions.commitChanges",
-					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == workspace",
+					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == workspace && sessions.hasGitRepository",
 					"group": "commit@1"
 				},
 				{
 					"command": "github.copilot.chat.mergeCopilotCLIAgentSessionChanges.merge",
-					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && !sessions.isMergeBaseBranchProtected && !sessions.hasPullRequest",
+					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && sessions.hasGitRepository && !sessions.isMergeBaseBranchProtected && !sessions.hasPullRequest",
 					"group": "merge@1"
 				},
 				{
 					"command": "github.copilot.chat.mergeCopilotCLIAgentSessionChanges.mergeAndSync",
-					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && !sessions.isMergeBaseBranchProtected && !sessions.hasPullRequest",
+					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && sessions.hasGitRepository && !sessions.isMergeBaseBranchProtected && !sessions.hasPullRequest",
 					"group": "merge@2"
 				},
 				{
 					"command": "github.copilot.chat.createPullRequestCopilotCLIAgentSession.createPR",
-					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && !sessions.hasPullRequest",
+					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && sessions.hasGitRepository && !sessions.hasPullRequest",
 					"group": "pull_request@1"
 				},
 				{
 					"command": "github.copilot.chat.createDraftPullRequestCopilotCLIAgentSession.createDraftPR",
-					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && !sessions.hasPullRequest",
+					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && sessions.hasGitRepository && !sessions.hasPullRequest",
 					"group": "pull_request@2"
 				},
 				{
 					"command": "github.copilot.chat.createPullRequestCopilotCLIAgentSession.updatePR",
-					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && sessions.hasPullRequest && sessions.hasOpenPullRequest",
+					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.isolationMode == worktree && sessions.hasGitRepository && sessions.hasPullRequest && sessions.hasOpenPullRequest",
 					"group": "pull_request@1"
 				}
 			],
@@ -5639,7 +5639,7 @@
 			"chat/input/editing/sessionChangeToolbar": [
 				{
 					"command": "github.copilot.sessions.discardChanges",
-					"when": "chatSessionType == copilotcli && isSessionsWindow",
+					"when": "chatSessionType == copilotcli && isSessionsWindow && sessions.changesVersionMode == branchChanges",
 					"group": "navigation@1"
 				}
 			]
@@ -6396,5 +6396,5 @@
 		"node-gyp": "npm:node-gyp@10.3.1",
 		"zod": "3.25.76"
 	},
-	"vscodeCommit": "e1ab55e1215fa458d1aeabcf8afd1a9478d2c47f"
+	"vscodeCommit": "4003d390fb8747be92b4e66c280584cf92579d16"
 }
