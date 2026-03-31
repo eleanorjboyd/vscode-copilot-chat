@@ -153,19 +153,24 @@ file.ts:5
 		expect(returnValue).toBe(cancellationReason);
 	});
 
-	it('does not yield incomplete patch when fetch is cancelled mid-stream', async () => {
-		// Stream is truncated before the last line "+one more new" is emitted,
-		// simulating a cancellation that cuts off the response mid-patch.
+	it('does not yield truncated patch when fetch is cancelled mid-stream', async () => {
+		// Full response would be:
+		//   file.ts:0 / -old / +new / file.ts:5 / -another old / +another new / +one more new
+		// But the fetch is cancelled right before "+one more new" is emitted,
+		// so the stream only delivers lines up to "+another new".
+		// The second patch is incomplete and must not be yielded.
 		const truncatedPatchText = `file.ts:0
 -old
 +new
 file.ts:5
 -another old
 +another new`;
+		// "+one more new" is missing — fetch was cancelled before it arrived
 		const linesStream = AsyncIterUtils.fromArray(truncatedPatchText.split('\n'));
 		const docId = DocumentId.create('file:///file.ts');
 		const documentBeforeEdits = new StringText('old\n');
 
+		let checkCount = 0;
 		const cancellationReason = new NoNextEditReason.GotCancelled('afterFetchCall');
 
 		const { edits, returnValue } = await consumeHandleResponse(
@@ -176,13 +181,14 @@ file.ts:5
 			undefined,
 			undefined,
 			() => {
-				// Fetch was cancelled — the full patch had "+one more new" but the
-				// stream was resolved early so it's missing from the second patch.
-				return cancellationReason;
+				// Fetch was still running (not yet cancelled) when the first edit was checked,
+				// but was cancelled before the second (incomplete) edit is about to be yielded.
+				return checkCount++ > 0 ? cancellationReason : undefined;
 			},
 		);
 
-		expect(edits).toHaveLength(0);
+		// The first (complete) edit is yielded; the second (truncated) edit is not
+		expect(edits).toHaveLength(1);
 		expect(returnValue).toBe(cancellationReason);
 	});
 });
