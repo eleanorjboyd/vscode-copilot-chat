@@ -6,7 +6,7 @@
 interface IMonacoPerformanceMarks {
 	mark(name: string, markOptions?: { startTime?: number }): void;
 	getMarks(): { name: string; startTime: number }[];
-	clearMarks(prefix: string): void;
+	clearMarks?(prefix: string): void;
 }
 
 function _getNativePolyfill(): IMonacoPerformanceMarks {
@@ -95,7 +95,7 @@ export function markChatExt(sessionId: string | undefined, name: ChatExtPerfMark
  * Clears all performance marks for the given chat session.
  */
 export function clearChatExtMarks(sessionId: string): void {
-	perf.clearMarks(`${chatExtPrefix}${sessionId}/`);
+	perf.clearMarks?.(`${chatExtPrefix}${sessionId}/`);
 }
 
 export const ChatExtGlobalPerfMark = {
