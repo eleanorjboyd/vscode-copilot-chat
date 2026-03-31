@@ -28,6 +28,7 @@ function _getNativePolyfill(): IMonacoPerformanceMarks {
 }
 
 const perf: IMonacoPerformanceMarks = (globalThis as { MonacoPerformanceMarks?: IMonacoPerformanceMarks }).MonacoPerformanceMarks ?? _getNativePolyfill();
+const skipPerf = !perf.clearMarks;
 
 const chatExtPrefix = 'code/chat/ext/';
 
@@ -86,6 +87,9 @@ export type ChatExtPerfMarkName = typeof ChatExtPerfMark[keyof typeof ChatExtPer
  * via {@link clearChatExtMarks}.
  */
 export function markChatExt(sessionId: string | undefined, name: ChatExtPerfMarkName): void {
+	if (skipPerf) {
+		return;
+	}
 	if (sessionId) {
 		perf.mark(`${chatExtPrefix}${sessionId}/${name}`);
 	}
@@ -118,6 +122,9 @@ export type ChatExtGlobalPerfMarkName = typeof ChatExtGlobalPerfMark[keyof typeo
  * Used for one-time activation marks like `willActivate` / `didActivate`.
  */
 export function markChatExtGlobal(name: ChatExtGlobalPerfMarkName): void {
+	if (skipPerf) {
+		return;
+	}
 	perf.mark(`${chatExtPrefix}${name}`);
 }
 
