@@ -69,10 +69,15 @@ export class XtabCustomDiffPatchResponseHandler {
 		workspaceRoot: URI | undefined,
 		window: OffsetRange | undefined,
 		originalWindow?: OffsetRange,
+		getFetchFailure?: () => NoNextEditReason | undefined,
 	): AsyncGenerator<StreamedEdit, NoNextEditReason, void> {
 		const activeDocRelativePath = toUniquePath(activeDocumentId, workspaceRoot?.path);
 		try {
 			for await (const edit of XtabCustomDiffPatchResponseHandler.extractEdits(linesStream)) {
+				const fetchFailure = getFetchFailure?.();
+				if (fetchFailure) {
+					return fetchFailure;
+				}
 				const targetDocument = edit.filePath === activeDocRelativePath
 					? activeDocumentId
 					: XtabCustomDiffPatchResponseHandler.resolveTargetDocument(edit.filePath, workspaceRoot) ?? activeDocumentId; // FIXME@ulugbekna: it's wrong to fallback to active document but just ignoring edits is also bad
