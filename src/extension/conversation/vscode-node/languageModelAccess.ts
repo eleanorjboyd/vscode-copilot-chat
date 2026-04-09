@@ -262,12 +262,13 @@ export class LanguageModelAccess extends Disposable implements IExtensionContrib
 			if (endpoint.degradationReason) {
 				modelTooltip = endpoint.degradationReason;
 			} else if (endpoint instanceof AutoChatEndpoint) {
-				if (this._authenticationService.copilotToken?.isNoAuthUser || (endpoint.discountRange.low === 0 && endpoint.discountRange.high === 0)) {
-					modelTooltip = vscode.l10n.t('Auto selects the best model for your request based on capacity and performance.');
-				} else if (endpoint.discountRange.low === endpoint.discountRange.high) {
-					modelTooltip = vscode.l10n.t('Auto selects the best model for your request based on capacity and performance. Auto is given a {0}% discount.', endpoint.discountRange.low * 100);
-				} else {
-					modelTooltip = vscode.l10n.t('Auto selects the best model for your request based on capacity and performance. Auto is given a {0}% to {1}% discount.', endpoint.discountRange.low * 100, endpoint.discountRange.high * 100);
+				modelTooltip = vscode.l10n.t('Auto selects the best model for your request based on capacity and performance.');
+				const plan = this._authenticationService.copilotToken?.copilotPlan;
+				const isOrgManaged = plan === 'business' || plan === 'enterprise';
+				const autoModeHint = this._expService.getTreatmentVariable<string>('copilotchat.autoModelHint');
+				const showExperimentalHint = endpoint instanceof AutoChatEndpoint && !isOrgManaged && !!autoModeHint && (autoModeHint.includes('minimax') || autoModeHint.includes('mm-base_') || autoModeHint.includes('mm-ft_'));
+				if (showExperimentalHint) {
+					modelTooltip += ' ' + vscode.l10n.t('This model may be experimental or in evaluation.');
 				}
 			} else {
 				modelTooltip = getModelCapabilitiesDescription(endpoint);
