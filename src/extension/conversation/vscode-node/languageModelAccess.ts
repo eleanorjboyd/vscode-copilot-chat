@@ -259,15 +259,19 @@ export class LanguageModelAccess extends Disposable implements IExtensionContrib
 			seenFamilies.add(endpoint.family);
 
 			const sanitizedModelName = endpoint.name.replace(/\(Preview\)/g, '').trim();
+
 			let modelTooltip: string | undefined;
 			if (endpoint.degradationReason) {
 				modelTooltip = endpoint.degradationReason;
 			} else if (endpoint instanceof AutoChatEndpoint) {
+				console.log('AUTOOOOOOO mode');
 				modelTooltip = vscode.l10n.t('Auto selects the best model for your request based on capacity and performance.');
 				const plan = this._authenticationService.copilotToken?.copilotPlan;
 				const isOrgManaged = plan === 'business' || plan === 'enterprise';
 				const autoModeHint = this._expService.getTreatmentVariable<string>('copilotchat.autoModelHint');
 				const showExperimentalHint = endpoint instanceof AutoChatEndpoint && !isOrgManaged && !!autoModeHint && (autoModeHint.includes('minimax') || autoModeHint.includes('mm-base_') || autoModeHint.includes('mm-ft_'));
+				console.log('SHOW EXPERIMENTAL HINT:', showExperimentalHint);
+				console.log('plan:', plan, 'isOrgManaged:', isOrgManaged, 'autoModeHint:', autoModeHint);
 				if (showExperimentalHint) {
 					modelTooltip += ' ' + vscode.l10n.t('This model may be experimental or in evaluation.');
 				}
